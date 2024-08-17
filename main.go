@@ -9,18 +9,12 @@ import (
 
 	"github.com/Muffin-laboratory/goMuffin/handler"
 	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
-	token := os.Getenv("TOKEN")
-	if err != nil {
-		fmt.Println("[goMuffin] 봇의 설절파일을 불러올 수가 없어요.")
-		log.Fatalln(err)
-	}
+	config := LoadConfig()
 
-	dg, err := discordgo.New("Bot " + token)
+	dg, err := discordgo.New("Bot " + config.token)
 	if err != nil {
 		fmt.Println("[goMuffin] 봇의 세션을 만들수가 없어요.")
 		log.Fatalln(err)
@@ -35,6 +29,5 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
-	// Cleanly close down the Discord session.
 	dg.Close()
 }
