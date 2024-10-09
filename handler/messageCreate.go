@@ -3,8 +3,8 @@ package handler
 import (
 	"strings"
 
-	"github.com/Muffin-laboratory/goMuffin/configs"
 	"github.com/bwmarrin/discordgo"
+	"gitlab.wh64.net/muffin/goMuffin/configs"
 )
 
 // MessageCreate is handlers of messageCreate event

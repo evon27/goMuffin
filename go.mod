@@ -1,4 +1,4 @@
-module github.com/Muffin-laboratory/goMuffin
+module gitlab.wh64.net/muffin/goMuffin
 
 go 1.23.2
 

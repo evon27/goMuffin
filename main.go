@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/Muffin-laboratory/goMuffin/configs"
-	"github.com/Muffin-laboratory/goMuffin/handler"
 	"github.com/bwmarrin/discordgo"
+	"gitlab.wh64.net/muffin/goMuffin/configs"
+	"gitlab.wh64.net/muffin/goMuffin/handler"
 )
 
 func main() {
