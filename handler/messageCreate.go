@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"gitlab.wh64.net/muffin/goMuffin/commands"
 	"gitlab.wh64.net/muffin/goMuffin/configs"
 )
 
@@ -16,9 +17,13 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if strings.HasPrefix(m.Content, config.Prefix) {
 		content := strings.TrimPrefix(m.Content, config.Prefix)
-		if content == "안녕" {
-			s.ChannelMessageSend(m.ChannelID, "안녕")
+		command := commands.Discommand.Aliases[content]
+
+		if command == "" {
+			return
 		}
+
+		commands.Discommand.MessageRun(command, s, m)
 	} else {
 		return
 	}
