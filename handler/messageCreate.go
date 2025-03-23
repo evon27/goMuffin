@@ -25,6 +25,8 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		command := commands.Discommand.Aliases[content]
 
 		if command == "" {
+			s.ChannelTyping(m.ChannelID)
+
 			var datas []databases.Text
 			var filter bson.D
 

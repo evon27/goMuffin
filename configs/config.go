@@ -8,7 +8,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var MUFFIN_VERSION = "0.0.0-gopher_canary.250323a"
+var MUFFIN_VERSION = "0.0.0-gopher_canary.250323b"
 
 // MuffinConfig for Muffin bot
 type MuffinConfig struct {
