@@ -8,12 +8,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var MUFFIN_VERSION = "0.0.0-gopher.e241009a"
+var MUFFIN_VERSION = "0.0.0-gopher_canary.250323a"
 
 // MuffinConfig for Muffin bot
 type MuffinConfig struct {
-	Token  string
-	Prefix string
+	Token       string
+	Prefix      string
+	DatabaseURL string
 }
 
 func loadConfig() *MuffinConfig {
@@ -29,9 +30,9 @@ func loadConfig() *MuffinConfig {
 }
 
 func setConfig(config *MuffinConfig) {
-	token := os.Getenv("TOKEN")
 	config.Prefix = os.Getenv("PREFIX")
-	config.Token = token
+	config.Token = os.Getenv("TOKEN")
+	config.DatabaseURL = os.Getenv("DATABASE_URL")
 }
 
 var Config *MuffinConfig = loadConfig()

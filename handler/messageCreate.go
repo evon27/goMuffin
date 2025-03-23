@@ -1,11 +1,16 @@
 package handler
 
 import (
+	"context"
+	"log"
+	"math/rand"
 	"strings"
 
 	"git.wh64.net/muffin/goMuffin/commands"
 	"git.wh64.net/muffin/goMuffin/configs"
+	"git.wh64.net/muffin/goMuffin/databases"
 	"github.com/bwmarrin/discordgo"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 // MessageCreate is handlers of messageCreate event
@@ -20,7 +25,17 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		command := commands.Discommand.Aliases[content]
 
 		if command == "" {
-			return
+			var datas []databases.Text
+
+			cur, err := databases.Texts.Find(context.TODO(), bson.D{{Key: "persona", Value: "muffin"}})
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			defer cur.Close(context.Background())
+			cur.All(context.TODO(), &datas)
+
+			s.ChannelMessageSendReply(m.ChannelID, datas[rand.Intn(len(datas))].Text, m.Reference())
 		}
 
 		commands.Discommand.MessageRun(command, s, m)

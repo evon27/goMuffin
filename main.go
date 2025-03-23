@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"syscall"
 
 	"git.wh64.net/muffin/goMuffin/configs"
+	"git.wh64.net/muffin/goMuffin/databases"
 	"git.wh64.net/muffin/goMuffin/handler"
 	"github.com/bwmarrin/discordgo"
 )
@@ -24,6 +26,12 @@ func main() {
 	dg.AddHandler(handler.MessageCreate)
 
 	dg.Open()
+
+	defer func() {
+		if err := databases.Client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
 
 	fmt.Println("[goMuffin] 봇이 실행되고 있어요. 버전:", configs.MUFFIN_VERSION)
 	sc := make(chan os.Signal, 1)
