@@ -26,8 +26,16 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		if command == "" {
 			var datas []databases.Text
+			var filter bson.D
 
-			cur, err := databases.Texts.Find(context.TODO(), bson.D{{Key: "persona", Value: "muffin"}})
+			channel, _ := s.Channel(m.ChannelID)
+			if channel.NSFW {
+				filter = bson.D{{}}
+			} else {
+				filter = bson.D{{Key: "persona", Value: "muffin"}}
+			}
+
+			cur, err := databases.Texts.Find(context.TODO(), filter)
 			if err != nil {
 				log.Fatalln(err)
 			}
