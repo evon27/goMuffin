@@ -42,7 +42,7 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				log.Fatalln(err)
 			}
 
-			defer cur.Close(context.Background())
+			defer cur.Close(context.TODO())
 			cur.All(context.TODO(), &datas)
 
 			s.ChannelMessageSendReply(m.ChannelID, datas[rand.Intn(len(datas))].Text, m.Reference())
