@@ -22,9 +22,11 @@ type DiscommandStruct struct {
 }
 
 func new() *DiscommandStruct {
-	discommand := DiscommandStruct{}
-	discommand.Commands = make(map[string]Command)
-	discommand.Aliases = make(map[string]string)
+	discommand := DiscommandStruct{
+		Commands: map[string]Command{},
+		Aliases:  map[string]string{},
+	}
+
 	discommand.loadCommands(HelpCommand)
 	return &discommand
 }
