@@ -30,8 +30,8 @@ func loadConfig() *MuffinConfig {
 }
 
 func setConfig(config *MuffinConfig) {
-	config.Prefix = os.Getenv("PREFIX")
-	config.Token = os.Getenv("TOKEN")
+	config.Prefix = os.Getenv("BOT_PREFIX")
+	config.Token = os.Getenv("BOT_TOKEN")
 	config.DatabaseURL = os.Getenv("DATABASE_URL")
 }
 
