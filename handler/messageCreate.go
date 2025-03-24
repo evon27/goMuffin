@@ -16,7 +16,7 @@ import (
 // MessageCreate is handlers of messageCreate event
 func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	config := configs.Config
-	if m.Author.ID == s.State.User.ID && m.Author.Bot {
+	if m.Author.ID == s.State.User.ID || m.Author.Bot {
 		return
 	}
 
