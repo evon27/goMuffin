@@ -8,7 +8,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var MUFFIN_VERSION = "0.0.0-gopher_canary.250323b"
+var MUFFIN_VERSION = "0.0.0-gopher_canary.250324a"
 
 type botConfig struct {
 	Token  string
