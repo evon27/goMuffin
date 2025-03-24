@@ -44,7 +44,6 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			var learnDatas []databases.Learn
 			var filter bson.D
 
-			ch := make(chan bool)
 			x := rand.Intn(5)
 
 			channel, _ := s.Channel(m.ChannelID)
@@ -76,18 +75,8 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				log.Fatalln(err)
 			}
 
-			go func() {
-				defer func() {
-					tCur.Close(context.TODO())
-					lCur.Close(context.TODO())
-				}()
-
-				tCur.All(context.TODO(), &datas)
-				lCur.All(context.TODO(), &learnDatas)
-				ch <- true
-			}()
-
-			<-ch
+			tCur.All(context.TODO(), &datas)
+			lCur.All(context.TODO(), &learnDatas)
 
 			if x > 2 && len(learnDatas) != 0 {
 				data := learnDatas[rand.Intn(len(learnDatas))]
