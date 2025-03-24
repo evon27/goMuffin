@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"strings"
+	"time"
 
 	"git.wh64.net/muffin/goMuffin/commands"
 	"git.wh64.net/muffin/goMuffin/configs"
@@ -20,9 +21,19 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.HasPrefix(m.Content, config.Prefix) {
-		content := strings.TrimPrefix(m.Content, config.Prefix)
+	if strings.HasPrefix(m.Content, config.Bot.Prefix) {
+		content := strings.TrimPrefix(m.Content, config.Bot.Prefix)
 		command := commands.Discommand.Aliases[content]
+
+		if m.Author.ID == config.Train.UserID {
+			if _, err := databases.Texts.InsertOne(context.TODO(), databases.InsertText{
+				Text:      content,
+				Persona:   "muffin",
+				CreatedAt: time.Now(),
+			}); err != nil {
+				log.Fatalln(err)
+			}
+		}
 
 		if command == "" {
 			s.ChannelTyping(m.ChannelID)
@@ -33,6 +44,14 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			channel, _ := s.Channel(m.ChannelID)
 			if channel.NSFW {
 				filter = bson.D{{}}
+
+				if _, err := databases.Texts.InsertOne(context.TODO(), databases.InsertText{
+					Text:      content,
+					Persona:   "user:" + m.Author.Username,
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Fatalln(err)
+				}
 			} else {
 				filter = bson.D{{Key: "persona", Value: "muffin"}}
 			}
@@ -46,9 +65,11 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			cur.All(context.TODO(), &datas)
 
 			s.ChannelMessageSendReply(m.ChannelID, datas[rand.Intn(len(datas))].Text, m.Reference())
+			return
 		}
 
 		commands.Discommand.MessageRun(command, s, m)
+		return
 	} else {
 		return
 	}

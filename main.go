@@ -17,7 +17,7 @@ import (
 func main() {
 	config := configs.Config
 
-	dg, err := discordgo.New("Bot " + config.Token)
+	dg, err := discordgo.New("Bot " + config.Bot.Token)
 	if err != nil {
 		fmt.Println("[goMuffin] 봇의 세션을 만들수가 없어요.")
 		log.Fatalln(err)
