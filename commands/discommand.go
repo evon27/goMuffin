@@ -4,7 +4,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// type messageRun func(s *discordgo.Session, m *discordgo.MessageCreate)
+type messageRun func(s *discordgo.Session, m *discordgo.MessageCreate)
 
 type DetailedDescription struct {
 	Usage    string
@@ -46,13 +46,13 @@ func (d *DiscommandStruct) loadCommands(command Command) {
 	}
 }
 
-func (d *DiscommandStruct) addMessageRun(name string, run func(s *discordgo.Session, m *discordgo.MessageCreate)) {
+func (d *DiscommandStruct) addMessageRun(name string, run messageRun) {
 	d.messageRuns[name] = run
 }
 
 func (d *DiscommandStruct) MessageRun(command string, s *discordgo.Session, m *discordgo.MessageCreate) {
 	// 더욱 나아진
-	d.messageRuns[command].(func(s *discordgo.Session, m *discordgo.MessageCreate))(s, m)
+	d.messageRuns[command].(messageRun)(s, m)
 }
 
 var Discommand *DiscommandStruct = new()
