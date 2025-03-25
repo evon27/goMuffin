@@ -4,6 +4,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+// type messageRun func(s *discordgo.Session, m *discordgo.MessageCreate)
+
 type DetailedDescription struct {
 	Usage    string
 	Examples []string
@@ -17,17 +19,21 @@ type Command struct {
 }
 
 type DiscommandStruct struct {
-	Commands map[string]Command
-	Aliases  map[string]string
+	Commands    map[string]Command
+	Aliases     map[string]string
+	messageRuns map[string]interface{}
 }
 
 func new() *DiscommandStruct {
 	discommand := DiscommandStruct{
-		Commands: map[string]Command{},
-		Aliases:  map[string]string{},
+		Commands:    map[string]Command{},
+		Aliases:     map[string]string{},
+		messageRuns: map[string]interface{}{},
 	}
 
 	discommand.loadCommands(HelpCommand)
+
+	discommand.addMessageRun(HelpCommand.Name, HelpCommand.helpMessageRun)
 	return &discommand
 }
 
@@ -40,12 +46,13 @@ func (d *DiscommandStruct) loadCommands(command Command) {
 	}
 }
 
+func (d *DiscommandStruct) addMessageRun(name string, run func(s *discordgo.Session, m *discordgo.MessageCreate)) {
+	d.messageRuns[name] = run
+}
+
 func (d *DiscommandStruct) MessageRun(command string, s *discordgo.Session, m *discordgo.MessageCreate) {
-	// 극한의 하드코딩 으아악
-	switch command {
-	case "도움말":
-		HelpCommand.MessageRun(s, m)
-	}
+	// 더욱 나아진
+	d.messageRuns[command].(func(s *discordgo.Session, m *discordgo.MessageCreate))(s, m)
 }
 
 var Discommand *DiscommandStruct = new()

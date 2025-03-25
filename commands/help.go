@@ -1,6 +1,10 @@
 package commands
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"fmt"
+
+	"github.com/bwmarrin/discordgo"
+)
 
 var HelpCommand Command = Command{
 	Name:        "도움말",
@@ -12,6 +16,7 @@ var HelpCommand Command = Command{
 	},
 }
 
-func (c *Command) MessageRun(s *discordgo.Session, m *discordgo.MessageCreate) {
+func (c *Command) helpMessageRun(s *discordgo.Session, m *discordgo.MessageCreate) {
+	fmt.Println(c.Name)
 	s.ChannelMessageSend(m.ChannelID, "asdf")
 }
