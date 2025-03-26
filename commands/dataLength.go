@@ -9,17 +9,18 @@ import (
 	"git.wh64.net/muffin/goMuffin/utils"
 	"github.com/bwmarrin/discordgo"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 type chStruct struct {
-	name   lenType
+	name   dataType
 	length int
 }
 
-type lenType int
+type dataType int
 
 const (
-	text lenType = iota
+	text dataType = iota
 	muffin
 	nsfw
 	learn
@@ -37,6 +38,41 @@ var DataLengthCommand *Command = &Command{
 		Usage: "머핀아 학습데이터량",
 	},
 }
+var ch chan chStruct = make(chan chStruct)
+
+func getLength(data dataType, userId string) {
+	var err error
+	var cur *mongo.Cursor
+	var datas []bson.M
+
+	switch data {
+	case text:
+		cur, err = databases.Texts.Find(context.TODO(), bson.D{{}})
+	case muffin:
+		cur, err = databases.Texts.Find(context.TODO(), bson.D{{Key: "persona", Value: "muffin"}})
+	case nsfw:
+		cur, err = databases.Texts.Find(context.TODO(), bson.D{
+			{
+				Key: "persona",
+				Value: bson.M{
+					"$regex": "^user",
+				},
+			},
+		})
+	case learn:
+		cur, err = databases.Learns.Find(context.TODO(), bson.D{{}})
+	case userLearn:
+		cur, err = databases.Learns.Find(context.TODO(), bson.D{{Key: "user_id", Value: userId}})
+	}
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer cur.Close(context.TODO())
+
+	cur.All(context.TODO(), &datas)
+	ch <- chStruct{name: data, length: len(datas)}
+}
 
 func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 	var i *discordgo.Interaction
@@ -47,8 +83,6 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 		nsfwLength,
 		learnLength,
 		userLearnLength int
-
-	ch := make(chan chStruct)
 
 	switch m := m.(type) {
 	case *discordgo.MessageCreate:
@@ -70,86 +104,15 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 			})
 	}
 
-	go func() {
-		var datas []databases.Text
-
-		cur, err := databases.Texts.Find(context.TODO(), bson.D{{}})
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		defer cur.Close(context.TODO())
-
-		cur.All(context.TODO(), &datas)
-		ch <- chStruct{name: text, length: len(datas)}
-	}()
-
-	go func() {
-		var datas []databases.Text
-
-		cur, err := databases.Texts.Find(context.TODO(), bson.D{{Key: "persona", Value: "muffin"}})
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		defer cur.Close(context.TODO())
-
-		cur.All(context.TODO(), &datas)
-		ch <- chStruct{name: muffin, length: len(datas)}
-	}()
-
-	go func() {
-		var datas []databases.Text
-
-		cur, err := databases.Texts.Find(context.TODO(), bson.D{
-			{
-				Key: "persona",
-				Value: bson.M{
-					"$regex": "^user",
-				},
-			},
-		})
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		defer cur.Close(context.TODO())
-
-		cur.All(context.TODO(), &datas)
-		ch <- chStruct{name: nsfw, length: len(datas)}
-	}()
-
-	go func() {
-		var datas []databases.Learn
-
-		cur, err := databases.Learns.Find(context.TODO(), bson.D{{}})
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		defer cur.Close(context.TODO())
-
-		cur.All(context.TODO(), &datas)
-		ch <- chStruct{name: learn, length: len(datas)}
-	}()
-
-	go func() {
-		var datas []databases.Learn
-
-		cur, err := databases.Learns.Find(context.TODO(), bson.D{{Key: "user_id", Value: userId}})
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		defer cur.Close(context.TODO())
-
-		cur.All(context.TODO(), &datas)
-		ch <- chStruct{name: userLearn, length: len(datas)}
-	}()
+	go getLength(text, "")
+	go getLength(muffin, "")
+	go getLength(nsfw, "")
+	go getLength(learn, "")
+	go getLength(userLearn, userId)
 
 	for i := 0; i < 5; i++ {
 		resp := <-ch
-		switch lenType(resp.name) {
+		switch dataType(resp.name) {
 		case text:
 			textLength = resp.length
 		case muffin:
