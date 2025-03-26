@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"git.wh64.net/muffin/goMuffin/commands"
 	"git.wh64.net/muffin/goMuffin/configs"
 	"git.wh64.net/muffin/goMuffin/databases"
 	"git.wh64.net/muffin/goMuffin/handler"
@@ -24,8 +25,13 @@ func main() {
 	}
 
 	dg.AddHandler(handler.MessageCreate)
+	dg.AddHandler(handler.InteractionCreate)
 
 	dg.Open()
+
+	for _, command := range commands.Discommand.Commands {
+		dg.ApplicationCommandCreate(dg.State.User.ID, "", command.ApplicationCommand)
+	}
 
 	defer func() {
 		if err := databases.Client.Disconnect(context.TODO()); err != nil {

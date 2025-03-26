@@ -5,6 +5,7 @@ import (
 )
 
 type messageRun func(s *discordgo.Session, m *discordgo.MessageCreate)
+type chatInputRun func(s *discordgo.Session, m *discordgo.InteractionCreate)
 
 type DetailedDescription struct {
 	Usage    string
@@ -12,28 +13,33 @@ type DetailedDescription struct {
 }
 
 type Command struct {
-	Name                string
+	*discordgo.ApplicationCommand
 	Aliases             []string
-	Description         string
 	DetailedDescription DetailedDescription
 }
 
 type DiscommandStruct struct {
-	Commands    map[string]Command
-	Aliases     map[string]string
-	messageRuns map[string]interface{}
+	Commands      map[string]Command
+	Aliases       map[string]string
+	messageRuns   map[string]interface{}
+	chatInputRuns map[string]interface{}
 }
 
 func new() *DiscommandStruct {
 	discommand := DiscommandStruct{
-		Commands:    map[string]Command{},
-		Aliases:     map[string]string{},
-		messageRuns: map[string]interface{}{},
+		Commands:      map[string]Command{},
+		Aliases:       map[string]string{},
+		messageRuns:   map[string]interface{}{},
+		chatInputRuns: map[string]interface{}{},
 	}
 
-	discommand.loadCommands(HelpCommand)
+	go discommand.loadCommands(HelpCommand)
+	go discommand.loadCommands(DataLengthCommand)
 
-	discommand.addMessageRun(HelpCommand.Name, HelpCommand.helpMessageRun)
+	go discommand.addMessageRun(HelpCommand.Name, HelpCommand.helpMessageRun)
+	go discommand.addMessageRun(DataLengthCommand.Name, DataLengthCommand.dataLengthMessageRun)
+
+	go discommand.addChatInputRun(DataLengthCommand.Name, DataLengthCommand.dataLenghChatInputRun)
 	return &discommand
 }
 
@@ -50,9 +56,17 @@ func (d *DiscommandStruct) addMessageRun(name string, run messageRun) {
 	d.messageRuns[name] = run
 }
 
+func (d *DiscommandStruct) addChatInputRun(name string, run chatInputRun) {
+	d.chatInputRuns[name] = run
+}
+
 func (d *DiscommandStruct) MessageRun(command string, s *discordgo.Session, m *discordgo.MessageCreate) {
 	// 더욱 나아진
 	d.messageRuns[command].(messageRun)(s, m)
+}
+
+func (d *DiscommandStruct) ChatInputRun(command string, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	d.chatInputRuns[command].(chatInputRun)(s, i)
 }
 
 var Discommand *DiscommandStruct = new()
