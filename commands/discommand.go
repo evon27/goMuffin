@@ -15,22 +15,22 @@ type DetailedDescription struct {
 type Command struct {
 	*discordgo.ApplicationCommand
 	Aliases             []string
-	DetailedDescription DetailedDescription
+	DetailedDescription *DetailedDescription
 }
 
 type DiscommandStruct struct {
-	Commands      map[string]Command
+	Commands      map[string]*Command
 	Aliases       map[string]string
-	messageRuns   map[string]interface{}
-	chatInputRuns map[string]interface{}
+	messageRuns   map[string]messageRun
+	chatInputRuns map[string]chatInputRun
 }
 
 func new() *DiscommandStruct {
 	discommand := DiscommandStruct{
-		Commands:      map[string]Command{},
+		Commands:      map[string]*Command{},
 		Aliases:       map[string]string{},
-		messageRuns:   map[string]interface{}{},
-		chatInputRuns: map[string]interface{}{},
+		messageRuns:   map[string]messageRun{},
+		chatInputRuns: map[string]chatInputRun{},
 	}
 
 	go discommand.loadCommands(HelpCommand)
@@ -43,7 +43,7 @@ func new() *DiscommandStruct {
 	return &discommand
 }
 
-func (d *DiscommandStruct) loadCommands(command Command) {
+func (d *DiscommandStruct) loadCommands(command *Command) {
 	d.Commands[command.Name] = command
 	d.Aliases[command.Name] = command.Name
 
@@ -62,11 +62,11 @@ func (d *DiscommandStruct) addChatInputRun(name string, run chatInputRun) {
 
 func (d *DiscommandStruct) MessageRun(command string, s *discordgo.Session, m *discordgo.MessageCreate) {
 	// 더욱 나아진
-	d.messageRuns[command].(messageRun)(s, m)
+	d.messageRuns[command](s, m)
 }
 
 func (d *DiscommandStruct) ChatInputRun(command string, s *discordgo.Session, i *discordgo.InteractionCreate) {
-	d.chatInputRuns[command].(chatInputRun)(s, i)
+	d.chatInputRuns[command](s, i)
 }
 
 var Discommand *DiscommandStruct = new()

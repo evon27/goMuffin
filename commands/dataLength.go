@@ -26,14 +26,14 @@ const (
 	userLearn
 )
 
-var DataLengthCommand Command = Command{
+var DataLengthCommand *Command = &Command{
 	ApplicationCommand: &discordgo.ApplicationCommand{
 		Type:        discordgo.ChatApplicationCommand,
 		Name:        "데이터학습량",
 		Description: "봇이 학습한 데ㅇ이터량을 보여줘요.",
 	},
 	Aliases: []string{"학습데이터량", "데이터량", "학습량"},
-	DetailedDescription: DetailedDescription{
+	DetailedDescription: &DetailedDescription{
 		Usage: "머핀아 학습데이터량",
 	},
 }
@@ -77,9 +77,11 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 		if err != nil {
 			log.Fatalln(err)
 		}
+
+		defer cur.Close(context.TODO())
+
 		cur.All(context.TODO(), &datas)
 		ch <- chStruct{name: text, length: len(datas)}
-
 	}()
 
 	go func() {
@@ -89,6 +91,9 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 		if err != nil {
 			log.Fatalln(err)
 		}
+
+		defer cur.Close(context.TODO())
+
 		cur.All(context.TODO(), &datas)
 		ch <- chStruct{name: muffin, length: len(datas)}
 	}()
@@ -107,6 +112,9 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 		if err != nil {
 			log.Fatalln(err)
 		}
+
+		defer cur.Close(context.TODO())
+
 		cur.All(context.TODO(), &datas)
 		ch <- chStruct{name: nsfw, length: len(datas)}
 	}()
@@ -118,6 +126,9 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 		if err != nil {
 			log.Fatalln(err)
 		}
+
+		defer cur.Close(context.TODO())
+
 		cur.All(context.TODO(), &datas)
 		ch <- chStruct{name: learn, length: len(datas)}
 	}()
@@ -129,6 +140,8 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 		if err != nil {
 			log.Fatalln(err)
 		}
+
+		defer cur.Close(context.TODO())
 
 		cur.All(context.TODO(), &datas)
 		ch <- chStruct{name: userLearn, length: len(datas)}
