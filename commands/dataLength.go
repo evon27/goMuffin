@@ -74,7 +74,7 @@ func getLength(data dataType, userId string) {
 	ch <- chStruct{name: data, length: len(datas)}
 }
 
-func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
+func (c *Command) dataLengthRun(s *discordgo.Session, m any) {
 	var i *discordgo.Interaction
 	var referance *discordgo.MessageReference
 	var username, userId, channelId string
@@ -110,7 +110,7 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m interface{}) {
 	go getLength(learn, "")
 	go getLength(userLearn, userId)
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		resp := <-ch
 		switch dataType(resp.name) {
 		case text:

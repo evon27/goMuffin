@@ -89,7 +89,7 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				ch <- 1
 			}()
 
-			for i := 0; i < 2; i++ {
+			for range 2 {
 				<-ch
 			}
 
