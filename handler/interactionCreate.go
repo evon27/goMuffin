@@ -7,5 +7,4 @@ import (
 
 func InteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	commands.Discommand.ChatInputRun(i.ApplicationCommandData().Name, s, i)
-	return
 }

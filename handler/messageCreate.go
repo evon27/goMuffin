@@ -44,6 +44,7 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			var learnDatas []databases.Learn
 			var filter bson.D
 
+			ch := make(chan int)
 			x := rand.Intn(5)
 
 			channel, _ := s.Channel(m.ChannelID)
@@ -62,21 +63,35 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				filter = bson.D{{Key: "persona", Value: "muffin"}}
 			}
 
-			tCur, err := databases.Texts.Find(context.TODO(), filter)
-			if err != nil {
-				log.Fatalln(err)
-			}
-
-			lCur, err := databases.Learns.Find(context.TODO(), bson.D{{Key: "command", Value: content}})
-			if err != nil {
-				if err == mongo.ErrNilDocument {
-					learnDatas = []databases.Learn{}
+			go func() {
+				cur, err := databases.Texts.Find(context.TODO(), filter)
+				if err != nil {
+					log.Fatalln(err)
 				}
-				log.Fatalln(err)
-			}
 
-			tCur.All(context.TODO(), &datas)
-			lCur.All(context.TODO(), &learnDatas)
+				defer cur.Close(context.TODO())
+
+				cur.All(context.TODO(), &datas)
+				ch <- 1
+			}()
+			go func() {
+				cur, err := databases.Learns.Find(context.TODO(), bson.D{{Key: "command", Value: content}})
+				if err != nil {
+					if err == mongo.ErrNilDocument {
+						learnDatas = []databases.Learn{}
+					}
+					log.Fatalln(err)
+				}
+
+				defer cur.Close(context.TODO())
+
+				cur.All(context.TODO(), &learnDatas)
+				ch <- 1
+			}()
+
+			for i := 0; i < 2; i++ {
+				<-ch
+			}
 
 			if x > 2 && len(learnDatas) != 0 {
 				data := learnDatas[rand.Intn(len(learnDatas))]
