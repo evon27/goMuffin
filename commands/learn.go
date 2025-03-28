@@ -62,8 +62,8 @@ func (c *Command) learnRun(s *discordgo.Session, m any) {
 
 		if len(matches) < 2 {
 			content := strings.TrimPrefix(m.Content, configs.Config.Bot.Prefix)
-			command = strings.Split(content, " ")[1]
-			result = strings.Split(content, " ")[2]
+			command = strings.ReplaceAll(strings.Split(content, " ")[1], "_", "")
+			result = strings.ReplaceAll(strings.Split(content, " ")[2], "_", "")
 
 			if command == "" || result == "" {
 				s.ChannelMessageSendEmbedReply(m.ChannelID, &discordgo.MessageEmbed{
