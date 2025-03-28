@@ -1,3 +1,5 @@
+github.com/LoperLee/golang-hangul-toolkit v1.1.0 h1:JEyLpLyA2hDQwWY9oCprHClnKIdkYVOSJzAat2uFX/A=
+github.com/LoperLee/golang-hangul-toolkit v1.1.0/go.mod h1:CDbZ23/IL4v2ovWIOb7xDEiFcSc0pIIbbYTpg+gP+Sk=
 github.com/bwmarrin/discordgo v0.28.1 h1:gXsuo2GBO7NbR6uqmrrBDplPUx2T3nzu775q/Rd1aG4=
 github.com/bwmarrin/discordgo v0.28.1/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

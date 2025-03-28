@@ -25,7 +25,7 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if strings.HasPrefix(m.Content, config.Bot.Prefix) {
 		content := strings.TrimPrefix(m.Content, config.Bot.Prefix)
-		command := commands.Discommand.Aliases[content]
+		command := commands.Discommand.Aliases[strings.Split(content, " ")[0]]
 
 		if m.Author.ID == config.Train.UserID {
 			if _, err := databases.Texts.InsertOne(context.TODO(), databases.InsertText{

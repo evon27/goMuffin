@@ -8,11 +8,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var MUFFIN_VERSION = "0.0.0-gopher_canary.250326a"
 
 type botConfig struct {
-	Token  string
-	Prefix string
+	Token   string
+	Prefix  string
+	OwnerId string
 }
 
 type trainConfig struct {
@@ -41,6 +41,7 @@ func loadConfig() *MuffinConfig {
 func setConfig(config *MuffinConfig) {
 	config.Bot.Prefix = os.Getenv("BOT_PREFIX")
 	config.Bot.Token = os.Getenv("BOT_TOKEN")
+	config.Bot.OwnerId = os.Getenv("BOT_OWNER_ID")
 
 	config.Train.UserID = os.Getenv("TRAIN_USER_ID")
 

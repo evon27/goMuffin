@@ -1,6 +1,8 @@
 package commands
 
 import (
+	// "fmt"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -16,6 +18,7 @@ type Command struct {
 	*discordgo.ApplicationCommand
 	Aliases             []string
 	DetailedDescription *DetailedDescription
+	discommand          *DiscommandStruct
 }
 
 type DiscommandStruct struct {
@@ -35,17 +38,22 @@ func new() *DiscommandStruct {
 
 	go discommand.loadCommands(HelpCommand)
 	go discommand.loadCommands(DataLengthCommand)
+	go discommand.loadCommands(LearnCommand)
 
 	go discommand.addMessageRun(HelpCommand.Name, HelpCommand.helpMessageRun)
 	go discommand.addMessageRun(DataLengthCommand.Name, DataLengthCommand.dataLengthMessageRun)
+	go discommand.addMessageRun(LearnCommand.Name, LearnCommand.learnMessageRun)
 
 	go discommand.addChatInputRun(DataLengthCommand.Name, DataLengthCommand.dataLenghChatInputRun)
+	go discommand.addChatInputRun(LearnCommand.Name, LearnCommand.learnChatInputRun)
 	return &discommand
 }
 
 func (d *DiscommandStruct) loadCommands(command *Command) {
 	d.Commands[command.Name] = command
 	d.Aliases[command.Name] = command.Name
+	// fmt.Println(command.Name)
+	command.discommand = d
 
 	for _, alias := range command.Aliases {
 		d.Aliases[alias] = command.Name
