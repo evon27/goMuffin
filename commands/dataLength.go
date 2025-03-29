@@ -2,7 +2,7 @@ package commands
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"strconv"
 
 	"git.wh64.net/muffin/goMuffin/databases"
@@ -65,7 +65,7 @@ func getLength(data dataType, userId string) {
 		cur, err = databases.Learns.Find(context.TODO(), bson.D{{Key: "user_id", Value: userId}})
 	}
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println(err)
 	}
 
 	defer cur.Close(context.TODO())
