@@ -6,7 +6,7 @@ WORKDIR /app
 COPY ./commands .
 COPY ./configs .
 COPY ./databases .
-COPY ./handlers .
+COPY ./handler .
 COPY ./utils .
 COPY go.mod .
 COPY go.sum .
