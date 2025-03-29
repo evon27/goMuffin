@@ -40,15 +40,18 @@ func new() *DiscommandStruct {
 	go discommand.loadCommands(DataLengthCommand)
 	go discommand.loadCommands(LearnCommand)
 	go discommand.loadCommands(LearnedDataListCommand)
+	go discommand.loadCommands(InformationCommand)
 
 	go discommand.addMessageRun(HelpCommand.Name, HelpCommand.helpMessageRun)
 	go discommand.addMessageRun(DataLengthCommand.Name, DataLengthCommand.dataLengthMessageRun)
 	go discommand.addMessageRun(LearnCommand.Name, LearnCommand.learnMessageRun)
 	go discommand.addMessageRun(LearnedDataListCommand.Name, LearnedDataListCommand.learnedDataListMessageRun)
+	go discommand.addMessageRun(InformationCommand.Name, InformationCommand.informationMessageRun)
 
 	go discommand.addChatInputRun(DataLengthCommand.Name, DataLengthCommand.dataLenghChatInputRun)
 	go discommand.addChatInputRun(LearnCommand.Name, LearnCommand.learnChatInputRun)
 	go discommand.addChatInputRun(LearnedDataListCommand.Name, LearnedDataListCommand.learnedDataListChatInputRun)
+	go discommand.addChatInputRun(InformationCommand.Name, DataLengthCommand.informationChatInputRun)
 	return &discommand
 }
 

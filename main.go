@@ -16,6 +16,7 @@ import (
 )
 
 func main() {
+	configs.TimeStart()
 	config := configs.Config
 
 	dg, err := discordgo.New("Bot " + config.Bot.Token)
