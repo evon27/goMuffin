@@ -39,20 +39,22 @@ func new() *DiscommandStruct {
 	go discommand.loadCommands(HelpCommand)
 	go discommand.loadCommands(DataLengthCommand)
 	go discommand.loadCommands(LearnCommand)
+	go discommand.loadCommands(LearnedDataListCommand)
 
 	go discommand.addMessageRun(HelpCommand.Name, HelpCommand.helpMessageRun)
 	go discommand.addMessageRun(DataLengthCommand.Name, DataLengthCommand.dataLengthMessageRun)
 	go discommand.addMessageRun(LearnCommand.Name, LearnCommand.learnMessageRun)
+	go discommand.addMessageRun(LearnedDataListCommand.Name, LearnedDataListCommand.learnedDataListMessageRun)
 
 	go discommand.addChatInputRun(DataLengthCommand.Name, DataLengthCommand.dataLenghChatInputRun)
 	go discommand.addChatInputRun(LearnCommand.Name, LearnCommand.learnChatInputRun)
+	go discommand.addChatInputRun(LearnedDataListCommand.Name, LearnedDataListCommand.learnedDataListChatInputRun)
 	return &discommand
 }
 
 func (d *DiscommandStruct) loadCommands(command *Command) {
 	d.Commands[command.Name] = command
 	d.Aliases[command.Name] = command.Name
-	// fmt.Println(command.Name)
 	command.discommand = d
 
 	for _, alias := range command.Aliases {
