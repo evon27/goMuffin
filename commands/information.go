@@ -25,7 +25,7 @@ func (c *Command) informationRun(s *discordgo.Session, m any) {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:  "운영 체제",
-				Value: runtime.GOOS + " " + runtime.GOARCH,
+				Value: utils.InlineCode(runtime.GOOS + " " + runtime.GOARCH),
 			},
 			{
 				Name:  "제작자",
