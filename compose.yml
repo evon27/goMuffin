@@ -1,0 +1,8 @@
+services:
+  discordbot:
+    container_name: "goMuffin"
+    build: "."
+    env_file:
+      - "./.env"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
