@@ -16,6 +16,17 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
+func argParser(content string) (args []string) {
+	for _, arg := range utils.FlexibleStringParser.FindAllStringSubmatch(content, -1) {
+		if arg[1] != "" {
+			args = append(args, arg[1])
+		} else {
+			args = append(args, arg[0])
+		}
+	}
+	return
+}
+
 // MessageCreate is handlers of messageCreate event
 func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	config := configs.Config
@@ -25,7 +36,8 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if strings.HasPrefix(m.Content, config.Bot.Prefix) {
 		content := strings.TrimPrefix(m.Content, config.Bot.Prefix)
-		command := commands.Discommand.Aliases[strings.Split(content, " ")[0]]
+		args := argParser(content)
+		command := commands.Discommand.Aliases[args[0]]
 
 		if m.Author.ID == config.Train.UserID {
 			if _, err := databases.Texts.InsertOne(context.TODO(), databases.InsertText{
@@ -104,7 +116,7 @@ func MessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		commands.Discommand.MessageRun(command, s, m)
+		commands.Discommand.MessageRun(command, s, m, args[1:])
 		return
 	} else {
 		return

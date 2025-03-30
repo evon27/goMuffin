@@ -37,6 +37,7 @@ var DataLengthCommand *Command = &Command{
 	DetailedDescription: &DetailedDescription{
 		Usage: "머핀아 학습데이터량",
 	},
+	Category: Generals,
 }
 var ch chan chStruct = make(chan chStruct)
 
@@ -172,10 +173,10 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m any) {
 	}
 }
 
-func (c *Command) dataLengthMessageRun(s *discordgo.Session, m *discordgo.MessageCreate) {
-	c.dataLengthRun(s, m)
+func (c *Command) dataLengthMessageRun(ctx *MsgContext) {
+	c.dataLengthRun(ctx.Session, ctx.Msg)
 }
 
-func (c *Command) dataLenghChatInputRun(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	c.dataLengthRun(s, i)
+func (c *Command) dataLenghChatInputRun(ctx *InterContext) {
+	c.dataLengthRun(ctx.Session, ctx.Inter)
 }

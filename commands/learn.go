@@ -9,9 +9,8 @@ import (
 	"git.wh64.net/muffin/goMuffin/configs"
 	"git.wh64.net/muffin/goMuffin/databases"
 	"git.wh64.net/muffin/goMuffin/utils"
-	"github.com/bwmarrin/discordgo"
-
 	"github.com/LoperLee/golang-hangul-toolkit/hangul"
+	"github.com/bwmarrin/discordgo"
 )
 
 var LearnCommand *Command = &Command{
@@ -42,6 +41,7 @@ var LearnCommand *Command = &Command{
 			"머핀아 배워 미간은_누구야? 이봇의_개발자요",
 		},
 	},
+	Category: Chattings,
 }
 
 func addPrefix(arr []string) (newArr []string) {
@@ -51,44 +51,36 @@ func addPrefix(arr []string) (newArr []string) {
 	return
 }
 
-func (c *Command) learnRun(s *discordgo.Session, m any) {
+func (c *Command) learnRun(s *discordgo.Session, m any, args *[]string) {
 	var userId, command, result string
 
 	igCommands := []string{}
 	switch m := m.(type) {
 	case *discordgo.MessageCreate:
 		userId = m.Author.ID
-		matches := utils.ExtractQuotedText.FindAllStringSubmatch(strings.TrimPrefix(m.Content, configs.Config.Bot.Prefix), 2)
 
-		if len(matches) < 2 {
-			content := strings.TrimPrefix(m.Content, configs.Config.Bot.Prefix)
-			command = strings.ReplaceAll(strings.Split(content, " ")[1], "_", "")
-			result = strings.ReplaceAll(strings.Split(content, " ")[2], "_", "")
-
-			if command == "" || result == "" {
-				s.ChannelMessageSendEmbedReply(m.ChannelID, &discordgo.MessageEmbed{
-					Title:       "❌ 오류",
-					Description: "올바르지 않ㅇ은 용법이에요.",
-					Fields: []*discordgo.MessageEmbedField{
-						{
-							Name:   "사용법",
-							Value:  utils.InlineCode(c.DetailedDescription.Usage),
-							Inline: true,
-						},
-						{
-							Name:  "예시",
-							Value: strings.Join(addPrefix(c.DetailedDescription.Examples), "\n"),
-						},
+		if len(*args) < 2 {
+			s.ChannelMessageSendEmbedReply(m.ChannelID, &discordgo.MessageEmbed{
+				Title:       "❌ 오류",
+				Description: "올바르지 않ㅇ은 용법이에요.",
+				Fields: []*discordgo.MessageEmbedField{
+					{
+						Name:   "사용법",
+						Value:  utils.InlineCode(c.DetailedDescription.Usage),
+						Inline: true,
 					},
-					Color: int(utils.EFail),
-				}, m.Reference())
-				return
-			}
-		} else {
-			command = matches[0][1]
-			result = matches[1][1]
+					{
+						Name:  "예시",
+						Value: strings.Join(addPrefix(c.DetailedDescription.Examples), "\n"),
+					},
+				},
+				Color: int(utils.EFail),
+			}, m.Reference())
+			return
 		}
 
+		command = strings.ReplaceAll((*args)[0], "_", " ")
+		result = strings.ReplaceAll((*args)[1], "_", " ")
 	case *discordgo.InteractionCreate:
 		s.InteractionRespond(m.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
@@ -206,10 +198,11 @@ func (c *Command) learnRun(s *discordgo.Session, m any) {
 	}
 }
 
-func (c *Command) learnMessageRun(s *discordgo.Session, m *discordgo.MessageCreate) {
-	c.learnRun(s, m)
+func (c *Command) learnMessageRun(ctx *MsgContext) {
+	c.learnRun(ctx.Session, ctx.Msg, &ctx.Args)
 }
 
-func (c *Command) learnChatInputRun(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	c.learnRun(s, i)
+func (c *Command) learnChatInputRun(ctx *InterContext) {
+	var args *[]string
+	c.learnRun(ctx.Session, ctx.Inter, args)
 }

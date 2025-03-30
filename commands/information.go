@@ -16,6 +16,7 @@ var InformationCommand *Command = &Command{
 	DetailedDescription: &DetailedDescription{
 		Usage: "머핀아 정보",
 	},
+	Category: Generals,
 }
 
 func (c *Command) informationRun(s *discordgo.Session, m any) {
@@ -65,10 +66,10 @@ func (c *Command) informationRun(s *discordgo.Session, m any) {
 	}
 }
 
-func (c *Command) informationMessageRun(s *discordgo.Session, m *discordgo.MessageCreate) {
-	c.informationRun(s, m)
+func (c *Command) informationMessageRun(ctx *MsgContext) {
+	c.informationRun(ctx.Session, ctx.Msg)
 }
 
-func (c *Command) informationChatInputRun(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	c.informationRun(s, i)
+func (c *Command) informationChatInputRun(ctx *InterContext) {
+	c.informationRun(ctx.Session, ctx.Inter)
 }

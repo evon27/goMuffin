@@ -23,6 +23,7 @@ var LearnedDataListCommand *Command = &Command{
 	DetailedDescription: &DetailedDescription{
 		Usage: "머핀아 리스트",
 	},
+	Category: Chattings,
 }
 
 func getDescriptions(datas *[]databases.Learn) (descriptions []string) {
@@ -114,10 +115,10 @@ func (c *Command) learnedDataListRun(s *discordgo.Session, m any) {
 	}
 }
 
-func (c *Command) learnedDataListMessageRun(s *discordgo.Session, m *discordgo.MessageCreate) {
-	c.learnedDataListRun(s, m)
+func (c *Command) learnedDataListMessageRun(ctx *MsgContext) {
+	c.learnedDataListRun(ctx.Session, ctx.Msg)
 }
 
-func (c *Command) learnedDataListChatInputRun(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	c.learnedDataListRun(s, i)
+func (c *Command) learnedDataListChatInputRun(ctx *InterContext) {
+	c.learnedDataListRun(ctx.Session, ctx.Inter)
 }

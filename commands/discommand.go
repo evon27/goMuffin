@@ -6,8 +6,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type messageRun func(s *discordgo.Session, m *discordgo.MessageCreate)
-type chatInputRun func(s *discordgo.Session, m *discordgo.InteractionCreate)
+type messageRun func(ctx *MsgContext)
+type chatInputRun func(s *InterContext)
+
+type Category string
 
 type DetailedDescription struct {
 	Usage    string
@@ -19,6 +21,7 @@ type Command struct {
 	Aliases             []string
 	DetailedDescription *DetailedDescription
 	discommand          *DiscommandStruct
+	Category            Category
 }
 
 type DiscommandStruct struct {
@@ -27,6 +30,22 @@ type DiscommandStruct struct {
 	messageRuns   map[string]messageRun
 	chatInputRuns map[string]chatInputRun
 }
+
+type MsgContext struct {
+	Session *discordgo.Session
+	Msg     *discordgo.MessageCreate
+	Args    []string
+}
+
+type InterContext struct {
+	Session *discordgo.Session
+	Inter   *discordgo.InteractionCreate
+}
+
+const (
+	Chattings Category = "채팅"
+	Generals  Category = "일반"
+)
 
 func new() *DiscommandStruct {
 	discommand := DiscommandStruct{
@@ -73,13 +92,13 @@ func (d *DiscommandStruct) addChatInputRun(name string, run chatInputRun) {
 	d.chatInputRuns[name] = run
 }
 
-func (d *DiscommandStruct) MessageRun(command string, s *discordgo.Session, m *discordgo.MessageCreate) {
+func (d *DiscommandStruct) MessageRun(command string, s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	// 더욱 나아진
-	d.messageRuns[command](s, m)
+	d.messageRuns[command](&MsgContext{s, m, args})
 }
 
 func (d *DiscommandStruct) ChatInputRun(command string, s *discordgo.Session, i *discordgo.InteractionCreate) {
-	d.chatInputRuns[command](s, i)
+	d.chatInputRuns[command](&InterContext{s, i})
 }
 
 var Discommand *DiscommandStruct = new()
