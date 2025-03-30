@@ -17,9 +17,15 @@ var InformationCommand *Command = &Command{
 		Usage: "머핀아 정보",
 	},
 	Category: Generals,
+	MessageRun: func(ctx *MsgContext) {
+		informationRun(ctx.Session, ctx.Msg)
+	},
+	ChatInputRun: func(ctx *InterContext) {
+		informationRun(ctx.Session, ctx.Inter)
+	},
 }
 
-func (c *Command) informationRun(s *discordgo.Session, m any) {
+func informationRun(s *discordgo.Session, m any) {
 	owner, _ := s.User(configs.Config.Bot.OwnerId)
 	embed := &discordgo.MessageEmbed{
 		Title: s.State.User.Username + "의 정보",
@@ -64,12 +70,4 @@ func (c *Command) informationRun(s *discordgo.Session, m any) {
 			},
 		})
 	}
-}
-
-func (c *Command) informationMessageRun(ctx *MsgContext) {
-	c.informationRun(ctx.Session, ctx.Msg)
-}
-
-func (c *Command) informationChatInputRun(ctx *InterContext) {
-	c.informationRun(ctx.Session, ctx.Inter)
 }

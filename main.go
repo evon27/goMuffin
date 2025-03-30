@@ -25,8 +25,14 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	dg.AddHandler(handler.MessageCreate)
-	dg.AddHandler(handler.InteractionCreate)
+	go commands.Discommand.LoadCommand(commands.HelpCommand)
+	go commands.Discommand.LoadCommand(commands.DataLengthCommand)
+	go commands.Discommand.LoadCommand(commands.LearnCommand)
+	go commands.Discommand.LoadCommand(commands.LearnedDataListCommand)
+	go commands.Discommand.LoadCommand(commands.InformationCommand)
+
+	go dg.AddHandler(handler.MessageCreate)
+	go dg.AddHandler(handler.InteractionCreate)
 
 	dg.Open()
 

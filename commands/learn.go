@@ -42,6 +42,13 @@ var LearnCommand *Command = &Command{
 		},
 	},
 	Category: Chattings,
+	MessageRun: func(ctx *MsgContext) {
+		learnRun(ctx.Command, ctx.Session, ctx.Msg, &ctx.Args)
+	},
+	ChatInputRun: func(ctx *InterContext) {
+		var args *[]string
+		learnRun(ctx.Command, ctx.Session, ctx.Inter, args)
+	},
 }
 
 func addPrefix(arr []string) (newArr []string) {
@@ -51,7 +58,7 @@ func addPrefix(arr []string) (newArr []string) {
 	return
 }
 
-func (c *Command) learnRun(s *discordgo.Session, m any, args *[]string) {
+func learnRun(c *Command, s *discordgo.Session, m any, args *[]string) {
 	var userId, command, result string
 
 	igCommands := []string{}
@@ -105,7 +112,7 @@ func (c *Command) learnRun(s *discordgo.Session, m any, args *[]string) {
 		}
 	}
 
-	for _, command := range c.discommand.Commands {
+	for _, command := range Discommand.Commands {
 		igCommands = append(igCommands, command.Name)
 		igCommands = append(igCommands, command.Aliases...)
 	}
@@ -196,13 +203,4 @@ func (c *Command) learnRun(s *discordgo.Session, m any, args *[]string) {
 			Embeds: &[]*discordgo.MessageEmbed{embed},
 		})
 	}
-}
-
-func (c *Command) learnMessageRun(ctx *MsgContext) {
-	c.learnRun(ctx.Session, ctx.Msg, &ctx.Args)
-}
-
-func (c *Command) learnChatInputRun(ctx *InterContext) {
-	var args *[]string
-	c.learnRun(ctx.Session, ctx.Inter, args)
 }

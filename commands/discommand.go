@@ -3,11 +3,13 @@ package commands
 import (
 	// "fmt"
 
+	"sync"
+
 	"github.com/bwmarrin/discordgo"
 )
 
 type messageRun func(ctx *MsgContext)
-type chatInputRun func(s *InterContext)
+type chatInputRun func(ctx *InterContext)
 
 type Category string
 
@@ -20,26 +22,27 @@ type Command struct {
 	*discordgo.ApplicationCommand
 	Aliases             []string
 	DetailedDescription *DetailedDescription
-	discommand          *DiscommandStruct
 	Category            Category
+	MessageRun          messageRun
+	ChatInputRun        chatInputRun
 }
 
 type DiscommandStruct struct {
-	Commands      map[string]*Command
-	Aliases       map[string]string
-	messageRuns   map[string]messageRun
-	chatInputRuns map[string]chatInputRun
+	Commands map[string]*Command
+	Aliases  map[string]string
 }
 
 type MsgContext struct {
 	Session *discordgo.Session
 	Msg     *discordgo.MessageCreate
 	Args    []string
+	Command *Command
 }
 
 type InterContext struct {
 	Session *discordgo.Session
 	Inter   *discordgo.InteractionCreate
+	Command *Command
 }
 
 const (
@@ -47,59 +50,49 @@ const (
 	Generals  Category = "일반"
 )
 
+var mutex *sync.Mutex = &sync.Mutex{}
+
 func new() *DiscommandStruct {
 	discommand := DiscommandStruct{
-		Commands:      map[string]*Command{},
-		Aliases:       map[string]string{},
-		messageRuns:   map[string]messageRun{},
-		chatInputRuns: map[string]chatInputRun{},
+		Commands: map[string]*Command{},
+		Aliases:  map[string]string{},
 	}
-
-	go discommand.loadCommands(HelpCommand)
-	go discommand.loadCommands(DataLengthCommand)
-	go discommand.loadCommands(LearnCommand)
-	go discommand.loadCommands(LearnedDataListCommand)
-	go discommand.loadCommands(InformationCommand)
-
-	go discommand.addMessageRun(HelpCommand.Name, HelpCommand.helpMessageRun)
-	go discommand.addMessageRun(DataLengthCommand.Name, DataLengthCommand.dataLengthMessageRun)
-	go discommand.addMessageRun(LearnCommand.Name, LearnCommand.learnMessageRun)
-	go discommand.addMessageRun(LearnedDataListCommand.Name, LearnedDataListCommand.learnedDataListMessageRun)
-	go discommand.addMessageRun(InformationCommand.Name, InformationCommand.informationMessageRun)
-
-	go discommand.addChatInputRun(HelpCommand.Name, HelpCommand.helpChatInputRun)
-	go discommand.addChatInputRun(DataLengthCommand.Name, DataLengthCommand.dataLenghChatInputRun)
-	go discommand.addChatInputRun(LearnCommand.Name, LearnCommand.learnChatInputRun)
-	go discommand.addChatInputRun(LearnedDataListCommand.Name, LearnedDataListCommand.learnedDataListChatInputRun)
-	go discommand.addChatInputRun(InformationCommand.Name, DataLengthCommand.informationChatInputRun)
 	return &discommand
 }
 
-func (d *DiscommandStruct) loadCommands(c *Command) {
+func (d *DiscommandStruct) LoadCommand(c *Command) {
+	mutex.Lock()
 	d.Commands[c.Name] = c
 	d.Aliases[c.Name] = c.Name
-	c.discommand = d
 
 	for _, alias := range c.Aliases {
 		d.Aliases[alias] = c.Name
 	}
+	mutex.Unlock()
 }
 
-func (d *DiscommandStruct) addMessageRun(name string, run messageRun) {
-	d.messageRuns[name] = run
+// func (d *DiscommandStruct) addMessageRun(name string, run messageRun) {
+// 	d.messageRuns[name] = run
+// }
+
+// func (d *DiscommandStruct) addChatInputRun(name string, run chatInputRun) {
+// 	d.chatInputRuns[name] = run
+// }
+
+func (d *DiscommandStruct) MessageRun(name string, s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
+	command := d.Commands[name]
+	if command == nil {
+		return
+	}
+	command.MessageRun(&MsgContext{s, m, args, command})
 }
 
-func (d *DiscommandStruct) addChatInputRun(name string, run chatInputRun) {
-	d.chatInputRuns[name] = run
-}
-
-func (d *DiscommandStruct) MessageRun(command string, s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
-	// 더욱 나아진
-	d.messageRuns[command](&MsgContext{s, m, args})
-}
-
-func (d *DiscommandStruct) ChatInputRun(command string, s *discordgo.Session, i *discordgo.InteractionCreate) {
-	d.chatInputRuns[command](&InterContext{s, i})
+func (d *DiscommandStruct) ChatInputRun(name string, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	command := d.Commands[name]
+	if command == nil {
+		return
+	}
+	command.ChatInputRun(&InterContext{s, i, command})
 }
 
 var Discommand *DiscommandStruct = new()

@@ -27,6 +27,8 @@ const (
 	userLearn
 )
 
+var ch chan chStruct = make(chan chStruct)
+
 var DataLengthCommand *Command = &Command{
 	ApplicationCommand: &discordgo.ApplicationCommand{
 		Type:        discordgo.ChatApplicationCommand,
@@ -38,8 +40,13 @@ var DataLengthCommand *Command = &Command{
 		Usage: "머핀아 학습데이터량",
 	},
 	Category: Generals,
+	MessageRun: func(ctx *MsgContext) {
+		dataLengthRun(ctx.Session, ctx.Msg)
+	},
+	ChatInputRun: func(ctx *InterContext) {
+		dataLengthRun(ctx.Session, ctx.Inter)
+	},
 }
-var ch chan chStruct = make(chan chStruct)
 
 func getLength(data dataType, userId string) {
 	var err error
@@ -75,7 +82,7 @@ func getLength(data dataType, userId string) {
 	ch <- chStruct{name: data, length: len(datas)}
 }
 
-func (c *Command) dataLengthRun(s *discordgo.Session, m any) {
+func dataLengthRun(s *discordgo.Session, m any) {
 	var i *discordgo.Interaction
 	var referance *discordgo.MessageReference
 	var username, userId, channelId string
@@ -171,12 +178,4 @@ func (c *Command) dataLengthRun(s *discordgo.Session, m any) {
 			Embeds: &[]*discordgo.MessageEmbed{embed},
 		})
 	}
-}
-
-func (c *Command) dataLengthMessageRun(ctx *MsgContext) {
-	c.dataLengthRun(ctx.Session, ctx.Msg)
-}
-
-func (c *Command) dataLenghChatInputRun(ctx *InterContext) {
-	c.dataLengthRun(ctx.Session, ctx.Inter)
 }

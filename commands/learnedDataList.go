@@ -24,6 +24,12 @@ var LearnedDataListCommand *Command = &Command{
 		Usage: "머핀아 리스트",
 	},
 	Category: Chattings,
+	MessageRun: func(ctx *MsgContext) {
+		learnedDataListRun(ctx.Session, ctx.Msg)
+	},
+	ChatInputRun: func(ctx *InterContext) {
+		learnedDataListRun(ctx.Session, ctx.Inter)
+	},
 }
 
 func getDescriptions(datas *[]databases.Learn) (descriptions []string) {
@@ -33,7 +39,7 @@ func getDescriptions(datas *[]databases.Learn) (descriptions []string) {
 	return
 }
 
-func (c *Command) learnedDataListRun(s *discordgo.Session, m any) {
+func learnedDataListRun(s *discordgo.Session, m any) {
 	var userId, globalName, avatarUrl string
 	var datas []databases.Learn
 	switch m := m.(type) {
@@ -113,12 +119,4 @@ func (c *Command) learnedDataListRun(s *discordgo.Session, m any) {
 			Embeds: &[]*discordgo.MessageEmbed{embed},
 		})
 	}
-}
-
-func (c *Command) learnedDataListMessageRun(ctx *MsgContext) {
-	c.learnedDataListRun(ctx.Session, ctx.Msg)
-}
-
-func (c *Command) learnedDataListChatInputRun(ctx *InterContext) {
-	c.learnedDataListRun(ctx.Session, ctx.Inter)
 }

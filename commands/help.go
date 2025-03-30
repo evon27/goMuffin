@@ -8,16 +8,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// 씨발 나중에 구조 개선 하면서 갈아 엎어야지
-var commandNames []string = []string{
-	"도움말",
-	"데이터학습량",
-	"정보",
-	"배워",
-	"리스트",
-	// "삭제",
-}
-
 var HelpCommand *Command = &Command{
 	ApplicationCommand: &discordgo.ApplicationCommand{
 		Type:        discordgo.ChatApplicationCommand,
@@ -30,10 +20,10 @@ var HelpCommand *Command = &Command{
 				Description: "해당 명령어에 대ㅎ한 도움말을 볼 수 있어요.",
 				Choices: func() []*discordgo.ApplicationCommandOptionChoice {
 					choices := []*discordgo.ApplicationCommandOptionChoice{}
-					for _, name := range commandNames {
+					for _, command := range Discommand.Commands {
 						choices = append(choices, &discordgo.ApplicationCommandOptionChoice{
-							Name:  name,
-							Value: name,
+							Name:  command.Name,
+							Value: command.Name,
 						})
 					}
 					return choices
@@ -47,6 +37,13 @@ var HelpCommand *Command = &Command{
 		Examples: []string{"머핀아 도움말", "머핀아 도움말 배워"},
 	},
 	Category: Generals,
+	MessageRun: func(ctx *MsgContext) {
+		helpRun(ctx.Command, ctx.Session, ctx.Msg, &ctx.Args)
+	},
+	ChatInputRun: func(ctx *InterContext) {
+		var args *[]string
+		helpRun(ctx.Command, ctx.Session, ctx.Inter, args)
+	},
 }
 
 func getCommandsByCategory(d *DiscommandStruct, category Category) []string {
@@ -59,7 +56,7 @@ func getCommandsByCategory(d *DiscommandStruct, category Category) []string {
 	return commands
 }
 
-func (c *Command) helpRun(s *discordgo.Session, m any, args *[]string) {
+func helpRun(c *Command, s *discordgo.Session, m any, args *[]string) {
 	var commandName string
 	embed := &discordgo.MessageEmbed{
 		Color: int(utils.EDefault),
@@ -84,14 +81,14 @@ func (c *Command) helpRun(s *discordgo.Session, m any, args *[]string) {
 		}
 	}
 
-	if commandName == "" || c.discommand.Commands[commandName] == nil {
+	if commandName == "" || Discommand.Commands[commandName] == nil {
 		embed.Title = s.State.User.Username + "의 도움말"
 		embed.Description = utils.CodeBlockWithLanguage(
 			"md",
 			"# 일반\n"+
-				strings.Join(getCommandsByCategory(c.discommand, Generals), "\n")+
+				strings.Join(getCommandsByCategory(Discommand, Generals), "\n")+
 				"\n\n# 채팅\n"+
-				strings.Join(getCommandsByCategory(c.discommand, Chattings), "\n"),
+				strings.Join(getCommandsByCategory(Discommand, Chattings), "\n"),
 		)
 
 		switch m := m.(type) {
@@ -108,7 +105,7 @@ func (c *Command) helpRun(s *discordgo.Session, m any, args *[]string) {
 		return
 	}
 
-	command := c.discommand.Commands[commandName]
+	command := Discommand.Commands[commandName]
 
 	embed.Title = s.State.User.Username + "의 " + command.Name + " 도움말"
 	embed.Fields = []*discordgo.MessageEmbedField{
@@ -159,13 +156,4 @@ func (c *Command) helpRun(s *discordgo.Session, m any, args *[]string) {
 			},
 		})
 	}
-}
-
-func (c *Command) helpMessageRun(ctx *MsgContext) {
-	c.helpRun(ctx.Session, ctx.Msg, &ctx.Args)
-}
-
-func (c *Command) helpChatInputRun(ctx *InterContext) {
-	var args *[]string
-	c.helpRun(ctx.Session, ctx.Inter, args)
 }
