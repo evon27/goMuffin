@@ -1,8 +1,6 @@
 package commands
 
 import (
-	// "fmt"
-
 	"sync"
 
 	"github.com/bwmarrin/discordgo"
@@ -70,14 +68,6 @@ func (d *DiscommandStruct) LoadCommand(c *Command) {
 	}
 	mutex.Unlock()
 }
-
-// func (d *DiscommandStruct) addMessageRun(name string, run messageRun) {
-// 	d.messageRuns[name] = run
-// }
-
-// func (d *DiscommandStruct) addChatInputRun(name string, run chatInputRun) {
-// 	d.chatInputRuns[name] = run
-// }
 
 func (d *DiscommandStruct) MessageRun(name string, s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	command := d.Commands[name]

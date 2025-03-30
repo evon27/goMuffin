@@ -36,10 +36,6 @@ func main() {
 
 	dg.Open()
 
-	for _, command := range commands.Discommand.Commands {
-		dg.ApplicationCommandCreate(dg.State.User.ID, "", command.ApplicationCommand)
-	}
-
 	defer func() {
 		if err := databases.Client.Disconnect(context.TODO()); err != nil {
 			panic(err)
