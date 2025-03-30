@@ -67,6 +67,7 @@ func new() *DiscommandStruct {
 	go discommand.addMessageRun(LearnedDataListCommand.Name, LearnedDataListCommand.learnedDataListMessageRun)
 	go discommand.addMessageRun(InformationCommand.Name, InformationCommand.informationMessageRun)
 
+	go discommand.addChatInputRun(HelpCommand.Name, HelpCommand.helpChatInputRun)
 	go discommand.addChatInputRun(DataLengthCommand.Name, DataLengthCommand.dataLenghChatInputRun)
 	go discommand.addChatInputRun(LearnCommand.Name, LearnCommand.learnChatInputRun)
 	go discommand.addChatInputRun(LearnedDataListCommand.Name, LearnedDataListCommand.learnedDataListChatInputRun)
@@ -74,13 +75,13 @@ func new() *DiscommandStruct {
 	return &discommand
 }
 
-func (d *DiscommandStruct) loadCommands(command *Command) {
-	d.Commands[command.Name] = command
-	d.Aliases[command.Name] = command.Name
-	command.discommand = d
+func (d *DiscommandStruct) loadCommands(c *Command) {
+	d.Commands[c.Name] = c
+	d.Aliases[c.Name] = c.Name
+	c.discommand = d
 
-	for _, alias := range command.Aliases {
-		d.Aliases[alias] = command.Name
+	for _, alias := range c.Aliases {
+		d.Aliases[alias] = c.Name
 	}
 }
 
