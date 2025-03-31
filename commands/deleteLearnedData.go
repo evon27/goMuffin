@@ -60,7 +60,7 @@ func deleteLearnedDataRun(c *Command, s *discordgo.Session, m any, args *[]strin
 					},
 					{
 						Name:  "예시",
-						Value: utils.InlineCode(strings.Join(addPrefix(c.DetailedDescription.Examples), "\n")),
+						Value: utils.CodeBlockWithLanguage("md", strings.Join(addPrefix(c.DetailedDescription.Examples), "\n")),
 					},
 				},
 				Color: int(utils.EFail),
@@ -130,8 +130,8 @@ func deleteLearnedDataRun(c *Command, s *discordgo.Session, m any, args *[]strin
 
 	embed := &discordgo.MessageEmbed{
 		Title: command + " 삭제",
-		Description: command + " 에 대한 대답 중 하나를 선ㅌ택하여 삭제해주세요.\n" +
-			utils.CodeBlockWithLanguage("md", description),
+		Description: utils.CodeBlockWithLanguage("md", "# "+command+" 에 대한 대답 중 하나를 선ㅌ택하여 삭제해주세요.\n"+
+			description),
 		Color: int(utils.EDefault),
 	}
 

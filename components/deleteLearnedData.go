@@ -69,6 +69,7 @@ var DeleteLearnedDataComponent *commands.Component = &commands.Component{
 				{
 					Title:       "✅ 삭제 완료",
 					Description: itemId + "번을 삭ㅈ제했어요.",
+					Color:       int(utils.ESuccess),
 				},
 			},
 			Components: &[]discordgo.MessageComponent{},

@@ -78,7 +78,7 @@ func learnRun(c *Command, s *discordgo.Session, m any, args *[]string) {
 					},
 					{
 						Name:  "예시",
-						Value: utils.InlineCode(strings.Join(addPrefix(c.DetailedDescription.Examples), "\n")),
+						Value: utils.CodeBlockWithLanguage("md", strings.Join(addPrefix(c.DetailedDescription.Examples), "\n")),
 					},
 				},
 				Color: int(utils.EFail),
