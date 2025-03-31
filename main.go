@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"git.wh64.net/muffin/goMuffin/commands"
+	"git.wh64.net/muffin/goMuffin/components"
 	"git.wh64.net/muffin/goMuffin/configs"
 	"git.wh64.net/muffin/goMuffin/databases"
 	"git.wh64.net/muffin/goMuffin/handler"
@@ -30,6 +31,9 @@ func main() {
 	go commands.Discommand.LoadCommand(commands.LearnCommand)
 	go commands.Discommand.LoadCommand(commands.LearnedDataListCommand)
 	go commands.Discommand.LoadCommand(commands.InformationCommand)
+	go commands.Discommand.LoadCommand(commands.DeleteLearnedDataCommand)
+
+	go commands.Discommand.LoadComponent(components.DeleteLearnedDataComponent)
 
 	go dg.AddHandler(handler.MessageCreate)
 	go dg.AddHandler(handler.InteractionCreate)

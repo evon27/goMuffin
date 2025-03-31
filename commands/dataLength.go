@@ -43,7 +43,7 @@ var DataLengthCommand *Command = &Command{
 	MessageRun: func(ctx *MsgContext) {
 		dataLengthRun(ctx.Session, ctx.Msg)
 	},
-	ChatInputRun: func(ctx *InterContext) {
+	ChatInputRun: func(ctx *ChatInputContext) {
 		dataLengthRun(ctx.Session, ctx.Inter)
 	},
 }

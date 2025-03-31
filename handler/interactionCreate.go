@@ -9,5 +9,7 @@ func InteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if i.Type == discordgo.InteractionApplicationCommand {
 		commands.Discommand.ChatInputRun(i.ApplicationCommandData().Name, s, i)
 		return
+	} else if i.Type == discordgo.InteractionMessageComponent {
+		commands.Discommand.ComponentRun(s, i)
 	}
 }

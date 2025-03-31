@@ -7,7 +7,9 @@ import (
 )
 
 type messageRun func(ctx *MsgContext)
-type chatInputRun func(ctx *InterContext)
+type chatInputRun func(ctx *ChatInputContext)
+type componentRun func(ctx *ComponentContext)
+type componentParse func(ctx *ComponentContext) bool
 
 type Category string
 
@@ -26,8 +28,9 @@ type Command struct {
 }
 
 type DiscommandStruct struct {
-	Commands map[string]*Command
-	Aliases  map[string]string
+	Commands   map[string]*Command
+	Components []*Component
+	Aliases    map[string]string
 }
 
 type MsgContext struct {
@@ -37,10 +40,21 @@ type MsgContext struct {
 	Command *Command
 }
 
-type InterContext struct {
+type ChatInputContext struct {
 	Session *discordgo.Session
 	Inter   *discordgo.InteractionCreate
 	Command *Command
+}
+
+type ComponentContext struct {
+	Session   *discordgo.Session
+	Inter     *discordgo.InteractionCreate
+	Component *Component
+}
+
+type Component struct {
+	Parse componentParse
+	Run   componentRun
 }
 
 const (
@@ -48,25 +62,33 @@ const (
 	Generals  Category = "일반"
 )
 
-var mutex *sync.Mutex = &sync.Mutex{}
+var mutex1 *sync.Mutex = &sync.Mutex{}
+var mutex2 *sync.Mutex = &sync.Mutex{}
 
 func new() *DiscommandStruct {
 	discommand := DiscommandStruct{
-		Commands: map[string]*Command{},
-		Aliases:  map[string]string{},
+		Commands:   map[string]*Command{},
+		Aliases:    map[string]string{},
+		Components: []*Component{},
 	}
 	return &discommand
 }
 
 func (d *DiscommandStruct) LoadCommand(c *Command) {
-	mutex.Lock()
+	mutex1.Lock()
 	d.Commands[c.Name] = c
 	d.Aliases[c.Name] = c.Name
 
 	for _, alias := range c.Aliases {
 		d.Aliases[alias] = c.Name
 	}
-	mutex.Unlock()
+	mutex1.Unlock()
+}
+
+func (d *DiscommandStruct) LoadComponent(c *Component) {
+	mutex2.Lock()
+	d.Components = append(d.Components, c)
+	mutex2.Unlock()
 }
 
 func (d *DiscommandStruct) MessageRun(name string, s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
@@ -82,7 +104,17 @@ func (d *DiscommandStruct) ChatInputRun(name string, s *discordgo.Session, i *di
 	if command == nil {
 		return
 	}
-	command.ChatInputRun(&InterContext{s, i, command})
+	command.ChatInputRun(&ChatInputContext{s, i, command})
+}
+
+func (d *DiscommandStruct) ComponentRun(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	for _, c := range d.Components {
+		if (!c.Parse(&ComponentContext{s, i, c})) {
+			return
+		}
+
+		c.Run(&ComponentContext{s, i, c})
+	}
 }
 
 var Discommand *DiscommandStruct = new()

@@ -27,7 +27,7 @@ var LearnedDataListCommand *Command = &Command{
 	MessageRun: func(ctx *MsgContext) {
 		learnedDataListRun(ctx.Session, ctx.Msg)
 	},
-	ChatInputRun: func(ctx *InterContext) {
+	ChatInputRun: func(ctx *ChatInputContext) {
 		learnedDataListRun(ctx.Session, ctx.Inter)
 	},
 }

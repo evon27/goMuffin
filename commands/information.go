@@ -20,7 +20,7 @@ var InformationCommand *Command = &Command{
 	MessageRun: func(ctx *MsgContext) {
 		informationRun(ctx.Session, ctx.Msg)
 	},
-	ChatInputRun: func(ctx *InterContext) {
+	ChatInputRun: func(ctx *ChatInputContext) {
 		informationRun(ctx.Session, ctx.Inter)
 	},
 }

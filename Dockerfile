@@ -8,6 +8,7 @@ COPY ./configs .
 COPY ./databases .
 COPY ./handler .
 COPY ./utils .
+COPY ./components .
 COPY go.mod .
 COPY go.sum .
 COPY main.go .
