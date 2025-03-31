@@ -70,7 +70,7 @@ func helpRun(c *Command, s *discordgo.Session, m any, args *[]string) {
 
 	switch m := m.(type) {
 	case *discordgo.MessageCreate:
-		commandName = strings.Join(*args, " ")
+		commandName = Discommand.Aliases[strings.Join(*args, " ")]
 	case *discordgo.InteractionCreate:
 		optsMap := map[string]*discordgo.ApplicationCommandInteractionDataOption{}
 		for _, opt := range m.ApplicationCommandData().Options {
